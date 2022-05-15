@@ -1,6 +1,6 @@
 import random
 from numpy import product
-
+import matplotlib.pylab as plt
 from sqlalchemy import null, true
 class Genetic:
     solution = list()
@@ -93,13 +93,16 @@ class Genetic:
                 best = el[0]
         return best
     # main function
-    def solve(self):
+    def solve(self,showProfit=0):
         self.initPopulation()
         gen =1
+        profits=[]
         while(gen<self.maxGen):
             # GenerationFitness is dict containing for each chromosome its fitness score
             GenerationFitness = self.fitness()
             self.solution  = self.getBestGen(GenerationFitness)
+            p = list(zip(*self.fitness()))[1]
+            profits.append(sum(p)/len(p))
             if self.verbose==1:
                 print("Gen ",gen,": ",self.solution,"Profit:",self.fitnessChromosome(self.solution))
             SelectedGen = self.Selection(GenerationFitness)
@@ -107,5 +110,9 @@ class Genetic:
             Mutated = self.Mutation(Crossed)
             self.population = Mutated
             gen+=1
-            
+        if showProfit==1:
+            plt.plot(range(1,len(profits)),profits[1:])
+            plt.xlabel("Generation")
+            plt.ylabel("Mean Profit")
+            plt.show()
         return self.solution
